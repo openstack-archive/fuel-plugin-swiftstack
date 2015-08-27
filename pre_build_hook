@@ -1,0 +1,17 @@
+#!/bin/bash
+set -eux
+
+ROOT="$(dirname `readlink -f $0`)"
+MODULES="${ROOT}"/deployment_scripts/puppet/modules
+RPM_REPO="${ROOT}"/repositories/centos/
+DEB_REPO="${ROOT}"/repositories/ubuntu/
+
+
+# Puppet manifests from fuel-lib
+FUEL_LIB_VERSION="6.1"
+FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/archive/${FUEL_LIB_VERSION}.tar.gz"
+
+# Include dependent manifests from fuel-library
+wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
+    tar -C "${MODULES}" --strip-components=3 -zxvf - \
+    fuel-library-${FUEL_LIB_VERSION}/deployment/puppet/{stdlib,concat,lvm,glance,swift,inifile,keystone}

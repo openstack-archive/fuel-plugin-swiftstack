@@ -1,0 +1,10 @@
+attributes:
+  swift_api_address:
+    value: '192.168.1.100'
+    label: 'Swift API IP Address'
+    description: 'Swift cluster API IP Address'
+    weight: 30
+    type: "text"
+    regex:
+        source: '^((?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})|(?:^)$'
+        error: "Invalid IP address"
