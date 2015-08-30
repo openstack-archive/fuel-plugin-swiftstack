@@ -5,14 +5,14 @@
 
 
 - role: ['primary-controller']
-  stage: post_deployment
+  stage: post_deployment/6000
   type: shell
   parameters:
     cmd: ruby delete_entrypoint.rb
     timeout: 120
 
 - role: ['primary-controller','controller']
-  stage: post_deployment
+  stage: post_deployment/6100
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/sscluster.pp
@@ -20,7 +20,7 @@
     timeout: 420
 
 - role: ['primary-controller']
-  stage: post_deployment
+  stage: post_deployment/6200
   type: shell
   parameters:
     cmd: ruby upload_cirros.rb

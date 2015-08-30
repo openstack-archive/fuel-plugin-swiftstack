@@ -8,6 +8,7 @@ class sscluster (
     $glance_user = 'glance',
     $glance_password = 'PASSWORD',
     $tenant = 'services',
+    $role = 'controller',
 )
 {
     case $::osfamily {
@@ -66,17 +67,19 @@ class sscluster (
         'glance_store/stores':  value => 'glance.store.swift.Store';
     }
 
-    notice("Update a keystone user for Swift Cluster: ${tenant}:${swift_user}")
-    class {'swift::keystone::auth':
-        auth_name => $swift_user,
-        password  => $swift_password,
-        tenant  => $tenant,
-        port => '80',
-        public_protocol => 'http',
-        public_address => $api_address,
-        admin_protocol => 'http',
-        admin_address => $api_address,
-        endpoint_prefix => 'KEY',
+    if $role == 'primary-controller' {
+        notice("Update a keystone user for Swift Cluster: ${tenant}:${swift_user}")
+        class {'swift::keystone::auth':
+            auth_name => $swift_user,
+            password  => $swift_password,
+            tenant  => $tenant,
+            port => '80',
+            public_protocol => 'http',
+            public_address => $api_address,
+            admin_protocol => 'http',
+            admin_address => $api_address,
+            endpoint_prefix => 'KEY',
+        }
     }
 
     notice("Start Glance API Service")

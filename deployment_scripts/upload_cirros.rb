@@ -86,12 +86,12 @@ def upload_image(image)
     return_code = $?.exitstatus
     if return_code == 0
       puts "Image '#{image['img_name']}' is already present!"
+      return 0
     else
       stdout = `glance image-delete #{list_of_images[:uuid][0]}`
       return_code = $?.exitstatus
       [ stdout, return_code ]
     end
-    return 0
   end
 
   stdout, return_code = image_create(image)

@@ -4,6 +4,7 @@ $fuel_settings = parseyaml(file('/etc/astute.yaml'))
 if $fuel_settings['swiftstack']['metadata']['enabled'] {
 
     notice("Enable SwiftStack Swift cluster ingegtation in $deployment_mode")
+    $role = $fuel_settings['role']
     $deployment_mode  = $fuel_settings['deployment_mode']
     $keystone_vip  = $fuel_settings['management_vip']
 
@@ -23,6 +24,7 @@ if $fuel_settings['swiftstack']['metadata']['enabled'] {
         glance_user => $glance_user,
         glance_password => $glance_password,
         tenant => $default_tenant,
+        role => $role,
     }
 
 } else {
