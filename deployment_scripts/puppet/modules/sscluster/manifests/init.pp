@@ -51,7 +51,7 @@ class sscluster (
 
     notice("Stop Glance API Service")
     exec { 'Stop glance-api':
-    	command => "service $glance_api stop",
+        command => "service $glance_api stop",
         path => ['/usr/bin', '/sbin', '/bin'],
     }
 
@@ -80,6 +80,7 @@ class sscluster (
             admin_address => $api_address,
             endpoint_prefix => 'KEY',
         }
+        Class['swift::keystone::auth'] ~> Service['glance-api']
     }
 
     notice("Start Glance API Service")
@@ -88,6 +89,9 @@ class sscluster (
         ensure => "running",
         hasstatus => true,
     }
+
+    Exec['Stop glance-api'] -> Class['glance::backend::swift'] ~> Service['glance-api']
+    Exec['Stop glance-api'] -> Glance_api_config<||> ~> Service['glance-api']
 
     if $deployment_mode == 'ha_compact' {
         service { 'swift-proxy':
