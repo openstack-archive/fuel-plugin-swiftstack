@@ -80,6 +80,7 @@ class sscluster (
             admin_address => $api_address,
             endpoint_prefix => 'KEY',
         }
+        Class['swift::keystone::auth'] ~> Service['glance-api']
     }
 
     notice("Start Glance API Service")
@@ -88,6 +89,10 @@ class sscluster (
         ensure => "running",
         hasstatus => true,
     }
+
+    Exec['Stop glance-api'] ->
+    Class['glance::backend::swift'] ->
+    Service['glance-api']
 
     if $deployment_mode == 'ha_compact' {
         service { 'swift-proxy':
