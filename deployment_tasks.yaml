@@ -1,0 +1,34 @@
+- id: swift
+  type: skipped
+
+- id: primary-swift
+  type: skipped
+
+- id: openstack-haproxy-swift
+  type: skipped
+
+- id: swift-rebalance-cron
+  type: skipped
+
+- id: swift-keystone
+  type: skipped
+
+- id: swift_zone
+  type: skipped
+
+- id: upload_cirros
+  type: shell
+  role: ['primary-controller']
+  condition: "settings:swiftstack.upload_cirros_test.value == true"
+
+- id: swiftstack_configure_swift_endpoint
+  role: ['primary-controller','controller']
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/sscluster.pp
+    puppet_modules: "puppet/modules:/etc/puppet/modules/"
+    timeout: 420
+
+
