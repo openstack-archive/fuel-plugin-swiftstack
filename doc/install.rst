@@ -1,8 +1,6 @@
 Installation Guide
 ==================
 
-
-
 Prepare Fuel Environment
 ------------------------
 #. Prepare a Fuel Master node to install `MOS 8.0`_ 
