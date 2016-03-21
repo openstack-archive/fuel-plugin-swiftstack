@@ -1,10 +1,81 @@
 attributes:
+  metadata:
+    toggleable: true
+    group: 'storage'
+    restrictions:
+      - condition: "settings:storage.objects_ceph.value == true"
+        action: disable
+
   swift_api_address:
     value: '192.168.1.100'
     label: 'Swift API IP Address'
-    description: 'Swift cluster API IP Address'
-    weight: 30
+    description: |
+      If enabled,
+      * Swift deployment in controller nodes will be disabled
+      * Swift API endpoint in Keysthone DB  will redirect to external Swift cluster.
+    weight: 5
     type: "text"
     regex:
-        source: '^((?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})|(?:^)$'
-        error: "Invalid IP address"
+      source: '^((?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})$'
+      error: "Invalid IP address. NOTE: it cannot be empty"
+
+  swift_api_fqdn:
+    value: ''
+    label: 'Swift API Hostname'
+    description: "Swift API Hostname"
+    weight: 10
+    type: "text"
+
+  swift_modify_hosts:
+    weight: 15
+    type: "checkbox"
+    value: True
+    label: "Add SwiftStack FQDN to /etc/hosts"
+    description: |
+      Use this option when you need to use domain name for your SwiftStack cluster,
+      but it cannot be resolved by DNS server specifed for Fuel environment
+      (f.e. in case of self-signed certificates usage). Enabled by default.
+
+  swift_tls_enabled:
+    weight: 20
+    type: "checkbox"
+    value: False
+    label: "Enable TLS for Swift endpoints"
+    description: |
+      Configures all Swift endpoint urls (public/internal/admin) with TLS support.
+    restrictions:
+      - condition: "settings:public_ssl.services.value == true"
+        message: "TLS for OpenStack public endpoints is enabled"
+        action: none
+
+  swift_tls_cert:
+    value: ''
+    label: 'SwiftStack self-signed certificate'
+    description: "If you use self-signed certificate for your SwiftStack cluster, please add it here for distribution of Fuel nodes"
+    weight: 25
+    type: "file"
+    restrictions:
+      - condition: "settings:swiftstack.swift_tls_enabled.value == false"
+        action: hide
+
+  swift_as_glance_backend:
+    weight: 30
+    type: "checkbox"
+    value: false
+    label: "Use Swift as Glance backend"
+    description: "Config Glance backend storage to Swift cluster"
+    restrictions:
+      - condition: "settings:storage.images_ceph.value == true"
+        action: disable
+
+  upload_cirros_test:
+    weight: 35
+    type: "checkbox"
+    value: false
+    label: "Enable upload test"
+    description: "Upload cirros base image to Glance and store it in Swift when the depoloyment is done"
+    restrictions:
+      - condition: "settings:swiftstack.swift_as_glance_backend.value == false"
+        action: disable
+
+
