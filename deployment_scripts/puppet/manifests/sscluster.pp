@@ -1,19 +1,24 @@
-$fuel_settings = parseyaml(file('/etc/astute.yaml'))
 
+notice('PLUGIN: SwiftStack Swift cluster integration/sscluster.pp')
 
-if $fuel_settings['swiftstack']['metadata']['enabled'] {
+$swiftstack = hiera_hash('swiftstack', {})
+$swift = hiera_hash('swift', {})
+$glance = hiera_hash('glance', {})
+
+if $swiftstack['metadata']['enabled'] {
 
     notice("Enable SwiftStack Swift cluster ingegtation in $deployment_mode")
-    $role = $fuel_settings['role']
-    $deployment_mode  = $fuel_settings['deployment_mode']
-    $keystone_vip  = $fuel_settings['management_vip']
+    $role = hiera('roles')
+    $deployment_mode = hiera('deployment_mode')
+    $keystone_vip = pick($swift['management_vip'], hiera('management_vip'))
 
-    $swift_api_address   = $fuel_settings['swiftstack']['swift_api_address']
-    $swift_user     = 'swift'
-    $swift_password = $fuel_settings['swift']['user_password']
-    $glance_user     = 'glance'
-    $glance_password = $fuel_settings['glance']['user_password']
-    $default_tenant   = $fuel_settings['workloads_collector']['tenant']
+
+    $swift_api_address   = $swiftstack['swift_api_address']
+    $swift_user     = pick($swift['user'], 'swift')
+    $swift_password = $swift['user_password']
+    $glance_user     = pick($glance['user'],'glance')
+    $glance_password = $glance['user_password']
+    $default_tenant   = pick($swift['tenant'], 'services')
 
     class {'sscluster':
         deployment_mode => $deployment_mode,
