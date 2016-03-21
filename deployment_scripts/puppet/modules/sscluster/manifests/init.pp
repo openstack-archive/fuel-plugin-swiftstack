@@ -67,7 +67,7 @@ class sscluster (
         'glance_store/stores':  value => 'glance.store.swift.Store';
     }
 
-    if $role == 'primary-controller' {
+    if 'primary-controller' in $role {
         notice("Update a keystone user for Swift Cluster: ${tenant}:${swift_user}")
         class {'swift::keystone::auth':
             auth_name => $swift_user,
