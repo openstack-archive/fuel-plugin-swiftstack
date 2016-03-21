@@ -1,0 +1,15 @@
+volumes:
+  - id: "swift"
+    type: "partition"
+    min_size: {generator: "calc_min_ceph_size"}
+    label: "swift"
+    name: "swift"
+    mount: "none"
+    partition_guid: "0FC63DAF-8483-4772-8E79-3D69D8477DE4"
+    file_system: "none"
+
+volumes_roles_mapping:
+  sscluster-node:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "min", id: "logs"}
+    - {allocate_size: "all", id: "swift"}
