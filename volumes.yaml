@@ -1,0 +1,20 @@
+volumes:
+  - id: "swift"
+    type: "vg"
+    min_size:
+      generator: "calc_gb_to_mb"
+      generator_args: [30]
+    label: "Swift volumes"
+    volumes:
+      - mount: "/srv/node"
+        type: "lv"
+        name: "swift"
+        file_system: "ext4"
+        size:
+          generator: "calc_total_vg"
+          generator_args: ["swift"]
+
+volumes_roles_mapping:
+  sscluster-node:
+    - {allocate_size: "min", id: "os"}
+    - {allocate_size: "all", id: "swift"}
