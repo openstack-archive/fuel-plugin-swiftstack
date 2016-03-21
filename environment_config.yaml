@@ -1,10 +1,36 @@
 attributes:
+  metadata:
+    group: 'storage'
+    restrictions:
+      - condition: "settings:storage.objects_ceph.value == true" 
+        action: disable
+
   swift_api_address:
     value: '192.168.1.100'
     label: 'Swift API IP Address'
-    description: 'Swift cluster API IP Address'
-    weight: 30
+    description: |
+      If enabled, 
+      * Swift deployment in controller nodes will be disabled
+      * Swift API endpoint in Keysthone DB  will redirect to external Swift cluster.
+    weight: 10
     type: "text"
     regex:
         source: '^((?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})|(?:^)$'
         error: "Invalid IP address"
+
+  upload_cirros_test:
+    weight: 20
+    type: "checkbox"
+    value: true
+    label: "Enable upload test"
+    description: "Upload cirros base image when the depoloyment is done"
+
+  swift_as_glance_backend:
+    weight: 20
+    type: "checkbox"
+    value: false
+    label: "Use Swift as Glance backend"
+    description: "Config Glance backend storage to Swift cluster"
+    restrictions:
+      - condition: "settings:storage.images_ceph.value == true"
+        action: disable
