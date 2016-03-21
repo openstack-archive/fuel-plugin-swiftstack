@@ -1,0 +1,64 @@
+- id: swift
+  version: 2.0.0
+  type: skipped
+
+- id: primary-swift
+  version: 2.0.0
+  type: skipped
+
+- id: openstack-haproxy-swift
+  version: 2.0.0
+  type: skipped
+
+- id: swift-rebalance-cron
+  version: 2.0.0
+  type: skipped
+
+- id: swift-keystone
+  version: 2.0.0
+  type: skipped
+
+- id: swift_zone
+  version: 2.0.0
+  type: skipped
+
+- id: upload_cirros
+  version: 2.0.0
+  type: shell
+  role: [primary-controller]
+  condition: "settings:swiftstack.upload_cirros_test.value == true"
+
+- id: swiftstack-hiera-override
+  version: 2.0.0
+  groups: [primary-controller, controller, compute, compute-vmware, cinder, cinder-vmware, primary-mongo, mongo, ceph-osd, virt]
+  requires: [globals]
+  required_for: [logging]
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/sscluster-hiera-override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules/
+    timeout: 420
+
+- id: swiftstack-configure-swift-endpoint
+  version: 2.0.0
+  role: [primary-controller]
+  required_for: [post_deployment_end, swiftstack-enable-glance-backend]
+  requires: [post_deployment_start, swiftstack_setup_swift_hostname]
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/sscluster-keystone.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules/
+    timeout: 420
+
+- id: swiftstack-enable-glance-backend
+  version: 2.0.0
+  role: [primary-controller, controller]
+  required_for: [post_deployment_end]
+  requires: [post_deployment_start]
+  cross-depends:
+    - name: swiftstack-configure-swift-endpoint
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/sscluster-glance.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules/
+    timeout: 420
