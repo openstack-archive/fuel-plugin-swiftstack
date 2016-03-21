@@ -1,8 +1,6 @@
 Installation Guide
 ==================
 
-
-
 Prepare Fuel Environment
 ------------------------
 #. Prepare a Fuel Master node to install `MOS 8.0`_ 
@@ -20,13 +18,13 @@ Install Plugin
 
     .. code-block:: bash
 
-        $ scp swiftstack-0.2-0.2.0-1.noarch.rpm root@<THE_FUEL_MASTER_NODE_IP>:/tmp/ 
+        $ scp swiftstack-0.3.0.3.0-1.noarch.rpm root@<THE_FUEL_MASTER_NODE_IP>:/tmp/ 
 
 #. Install SwiftStack plugin 
 
     .. code-block:: bash
 
-        [root@fuel ~]$ fuel plugins --install swiftstack-0.2-0.2.0-1.noarch.rpm 
+        [root@fuel ~]$ fuel plugins --install swiftstack-0.3.0.3.0-1.noarch.rpm 
 
 #. List all Fuel plugins and make sure it’s running
 
@@ -36,7 +34,7 @@ Install Plugin
 
         id | name       | version | package_version
         ---|------------|---------|----------------
-        2  | swiftstack | 0.2.0   | 3.0.0
+        2  | swiftstack | 0.3.0   | 4.0.0
 
 
 
