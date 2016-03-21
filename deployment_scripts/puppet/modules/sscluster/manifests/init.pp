@@ -67,7 +67,7 @@ class sscluster (
         'glance_store/stores':  value => 'glance.store.swift.Store';
     }
 
-    if $role == 'primary-controller' {
+    if 'primary-controller' in $role {
         notice("Update a keystone user for Swift Cluster: ${tenant}:${swift_user}")
         class {'swift::keystone::auth':
             auth_name => $swift_user,
@@ -94,6 +94,7 @@ class sscluster (
     Exec['Stop glance-api'] -> Glance_api_config<||> ~> Service['glance-api']
 
     if $deployment_mode == 'ha_compact' {
+/*
         service { 'swift-proxy':
             name      => $swift_proxy,
             ensure    => "stopped",
@@ -175,6 +176,7 @@ class sscluster (
             enable    => false,
             hasstatus => true,
         }
+*/
     }
 
 }
