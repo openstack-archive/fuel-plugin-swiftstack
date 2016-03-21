@@ -1,0 +1,10 @@
+<% if @swift_tls_enabled -%>
+use_ssl:
+  swift: true
+  swift_internal: true
+  swift_internal_certdata:
+    content: '<%= @swift_tls_cert %>'
+    name: swiftstack.pem
+  swift_internal_hostname: <%= @swift_api_fqdn %>
+  swift_internal_ip: <%= @swift_api_address %>
+<% end -%>
