@@ -6,12 +6,26 @@ MODULES="${ROOT}"/deployment_scripts/puppet/modules
 RPM_REPO="${ROOT}"/repositories/centos/
 DEB_REPO="${ROOT}"/repositories/ubuntu/
 
-
 # Puppet manifests from fuel-lib
-FUEL_LIB_VERSION="6.1"
-FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/archive/${FUEL_LIB_VERSION}.tar.gz"
+FUEL_LIB_VERSION="7.0"
+FUEL_LIB_TARBALL_URL="https://github.com/openstack/fuel-library/archive/${FUEL_LIB_VERSION}.tar.gz"
+
+# Puppet std library
+STDLIB_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.7.0.tar.gz"
+INIFILE_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-inifile-1.4.2.tar.gz"
+
+
+rm -rf "${MODULES:?}"/{openstacklib,glance,swift,keystone,stdlib,inifile}
 
 # Include dependent manifests from fuel-library
 wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
     tar -C "${MODULES}" --strip-components=3 -zxvf - \
-    fuel-library-${FUEL_LIB_VERSION}/deployment/puppet/{stdlib,concat,lvm,glance,swift,inifile,keystone}
+    fuel-library-${FUEL_LIB_VERSION}/deployment/puppet/{openstacklib,glance,swift,keystone}
+
+
+mkdir -p "${MODULES}"/{stdlib,inifile}
+wget -qO- "${STDLIB_TARBALL_URL}" | tar -C "${MODULES}/stdlib" --strip-components=1 -xz
+wget -qO- "${INIFILE_TARBALL_URL}" | tar -C "${MODULES}/inifile" --strip-components=1 -xz
+
+
+
