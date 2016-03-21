@@ -1,5 +1,5 @@
 
-Guide to the Swiftstack plugin for Fuel ver. 0.2-0.2.0-1
+Guide to the Swiftstack plugin for Fuel ver. 0.3.0.3.0-1
 ========================================================
 
 .. toctree::
