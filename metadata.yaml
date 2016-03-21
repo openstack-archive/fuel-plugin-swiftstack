@@ -3,11 +3,12 @@ name: swiftstack
 # Human-readable name for your plugin
 title: Enable SwiftStack Swift cluster integration
 # Plugin version
-version: '0.2.0'
+version: '0.3.0'
 # Description
 description: Integrate Keystone, Glance and an existing SwiftStack Swift cluster
 # Required fuel version
 fuel_version: ['8.0']
+is_hotpluggable: true
 
 # The plugin is compatible with releases in the list
 releases:
@@ -18,7 +19,7 @@ releases:
     repository_path: repositories/ubuntu
 
 # Version of plugin package
-package_version: '3.0.0'
+package_version: '4.0.0'
 # Licences
 licenses: ['Apache License Version 2.0']
 # Specify author or company name
