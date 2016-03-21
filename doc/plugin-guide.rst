@@ -1,14 +1,12 @@
-SwiftStack Fuel Plugin
-======================
+************************************************************
+Guide to the SwiftStack Plugin version 0.3-0.3.0-1 for Fuel
+************************************************************
 
-Allow Mirantis OpenStack environment able to use a running Swift cluster managed by  
-a SwiftStack Controller. In SwiftStack fuel plugin, it disables the default Swift cluster 
-on Controller and Primary-Controller nodes, and then reconfigures Swift API endpoints, 
-Keystone, Glance settings and point them to a running SwiftStack Swift cluster.
-
+This document provides instructions for installing, configuring and using
+SwiftStack plugin for Fuel.
 
 Key terms, acronyms and abbreviations
--------------------------------------
+=====================================
 
 SwiftStack On-Premises controller
     Provides a management service inside user's private place to help users to deploy 
@@ -20,14 +18,37 @@ SwiftStack Public Controller
 
 SwiftStack Nodes
     A node installed SwiftStack agents and packages, that can be managed by a 
-    SwiftStack Controller, the node could be assigned a Swift role likes ``Swift node``
+    SwiftStack ccontroller, the node could be assigned a Swift role likes ``Swift node``
     (Proxy/Account/Container/Object services are running in a single node)
 
+
+SwiftStack Fuel Plugin
+======================
+
+Allow Mirantis OpenStack environment able to use a running Swift cluster managed by 
+a SwiftStack Controller. SwiftStack fuel plugin disables the default Swift cluster 
+that deployed on the Controller or Primary-Controller nodes, and then reconfigures 
+Swift API endpoints, Keystone and Glance settings to a running SwiftStack Swift cluster.
+
 Requirements
------------
+------------
+
+
+License
+-------
+
+==========================   ==================
+Component                    License type
+==========================   ==================
+No components are present
+==========================   ==================
+
+
+Requirements
+------------
 
 +-----------------------------------+---------------------------------------------+
-|Requirement                        | Version                                     |
+|Requirement                        | Version/Comment                             |
 +===================================+=============================================+
 |Mirantis OpenStack compatibility   | 8.0                                         |
 +-----------------------------------+---------------------------------------------+
@@ -45,9 +66,25 @@ from the OpenStack environment. Make sure you have the correct network configura
 for the Swift cluster and Mirantis OpenStack environment before you enable this plugin.
 
 
+Installation Guide
+==================
+
+.. toctree::
+    :maxdepth: 2
+
+    install
+
+
+User Guide
+==========
+
+.. toctree::
+    :maxdepth: 2
+
+    user
 
 Known issues
-------------
+============
 
 #. Need DNS server support to map Swift APIs hostname and IP
 
@@ -56,8 +93,15 @@ Known issues
 
 #. Self-signed SSL certificates are not supported in the SwiftStack plugin
 
-    Self-signed certificates could be an issue when used in a production environment 
+    Self-signed certificates could be an issue when used in a production environment
     because all clients need to trust the cert to pass the TLS/SSL verification.
-    It is highly recommended to use certificates signed by a known, trusted Certificate 
-    Authority if you require TLS/SSL for your Swift cluster endpoint.
+    It is highly recommended to use certificates signed by a known, trusted Certificate
+
+
+Appendix
+========
+
+#. SwiftStack docs can be found at https://swiftstack.com/docs/
+
+
 
