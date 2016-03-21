@@ -14,7 +14,7 @@ Requirements
 
 | Requirement                    | Version/Comment |
 |--------------------------------|-----------------|
-| Mirantis OpenStack compatility | 6.1 or higher   |
+| Mirantis OpenStack compatility | 8.0 or higher   |
 | A running SwiftStack Swift cluster | all versions, the `Keystone Auth` and `'Keystone Auth Token Support` middlewares must be enable |
 
 
@@ -33,8 +33,8 @@ $ sudo apt-get install python-dev python-pip python-virtualenv
 $ virtualenv fuel
 
 # Clone fule-plugin-builder and SwiftStack Swift Fuel plugin
-$ git clone https://github.com/stackforge/fuel-plugins
-$ git clone https://github.com/stackforge/fuel-plugin-swiftstack
+$ git clone https://github.com/openstack/fuel-plugins
+$ git clone https://github.com/openstack/fuel-plugin-swiftstack
 
 $ source fuel/bin/activate
 (fuel) $ cd fuel-plugins/fuel_plugin_builder/
