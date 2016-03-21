@@ -1,10 +1,61 @@
 attributes:
+  metadata:
+    toggleable: true
+    group: 'storage'
+    restrictions:
+      - condition: "settings:storage.objects_ceph.value == true"
+        action: disable
+
   swift_api_address:
     value: '192.168.1.100'
     label: 'Swift API IP Address'
-    description: 'Swift cluster API IP Address'
-    weight: 30
+    description: |
+      If enabled,
+      * Swift deployment in controller nodes will be disabled
+      * Swift API endpoint in Keysthone DB  will redirect to external Swift cluster.
+    weight: 10
     type: "text"
     regex:
-        source: '^((?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})|(?:^)$'
-        error: "Invalid IP address"
+      source: '^((?:\d|1?\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d|1?\d\d|2[0-4]\d|25[0-5])){3})|(?:^)$'
+      error: "Invalid IP address"
+
+  swift_api_fqdn:
+    value: ''
+    label: 'Swift API Hostname'
+    description: "Swift API Hostname"
+    weight: 15
+    type: "text"
+
+  swift_tls_enabled:
+    weight: 5
+    type: "checkbox"
+    value: False
+    label: "Enable TLS for Swift endpoints"
+    description: |
+      Configures all Swift endpoint urls (public/internal/admin) with TLS support.
+    restrictions:
+      - condition: "settings:public_ssl.services.value == true"
+        message: "TLS for OpenStack public endpoints is enabled"
+        action: none
+
+  swift_as_glance_backend:
+    weight: 20
+    type: "checkbox"
+    value: false
+    label: "Use Swift as Glance backend"
+    description: "Config Glance backend storage to Swift cluster"
+    restrictions:
+      - condition: "settings:storage.images_ceph.value == true"
+        action: disable
+
+  upload_cirros_test:
+    weight: 30
+    type: "checkbox"
+    value: false
+    label: "Enable upload test"
+    description: "Upload cirros base image to Glance and store it in Swift when the depoloyment is done"
+    restrictions:
+      - condition: "settings:swiftstack.swift_as_glance_backend.value == false"
+        action: disable
+
+
