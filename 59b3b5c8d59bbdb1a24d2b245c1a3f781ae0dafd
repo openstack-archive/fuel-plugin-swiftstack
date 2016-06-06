@@ -1,0 +1,8 @@
+Code-Review+2: Charles Hsu <charles0126@gmail.com>
+Workflow+1: Charles Hsu <charles0126@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 06 Jun 2016 06:28:36 +0000
+Reviewed-on: https://review.openstack.org/295069
+Project: openstack/fuel-plugin-swiftstack
+Branch: refs/heads/master
