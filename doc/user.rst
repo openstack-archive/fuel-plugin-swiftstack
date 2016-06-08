@@ -70,12 +70,14 @@ to configure the firewall.
 Fuel Slave Nodes
 ----------------
 
-Fuel slave nodes have three network interfaces to configure, so if SwiftStack Nodes are connected to these 
-three networks and use same IP range of `Fuel's configuration`_, you need to skip the IPs that used for SwiftStack 
-Nodes. The reason is the Fuel master doesn't know which IP is taken from SwiftStack Nodes.
+Fuel slave nodes have three major networks(public, storage, management) to configure, so if SwiftStack Nodes are 
+connected to these three networks and use same IP range of `Fuel's configuration`_, you need to skip the IPs that 
+used for SwiftStack Nodes. The reason is the Fuel master doesn't know which IP is taken from SwiftStack Nodes.
 
 The SwiftStack Swift cluster is a standalone cluster, and each client should come from Outward-facing network
-(Fuel Public Network).  So connected to the Fuel slave nodes with Outward-facing network should be enough.
+(Fuel Public Network).  So connected to the Fuel slave nodes with Outward-facing network that's for clients. 
+Then Fuel Managment network will use for doing user token validation between the Swift cluster and Keystone 
+server. The SwiftStack cluster-facing and data replication network should be over Fuel Storage network. 
 
 .. _Fuel's configuration: http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-install-guide/install/install_change_network_interface.html#configure-a-network-interface-for-the-fuel-web-ui
 
@@ -84,11 +86,15 @@ Network summary
 
 Please make sure the network configuration like:
 
-    1. Fuel controller nodes (Keystone, Glance) can talk to Swift Proxy-server (i.e., 
-       Proxy-only, PAC, PACO node) for :ref:`Outward-facing IP<proxy_outward_facing_ip>`.
-    2. Clients can talk to :ref:`Swift API IP Address<swift_api_ip>` (Swift Proxy or 
+    #. Fuel controller nodes (Keystone, Glance) can talk to Swift Proxy-server (i.e., 
+       Proxy-only, PAC, PACO node) over Fuel Management network
+    
+    #. Clients can talk to :ref:`Swift API IP Address<swift_api_ip>` (Swift Proxy or 
        External/Internal Load Balancer)
-    3. SwiftStack nodes can talk to SwiftStack Controller via Management (SwiftStack) 
+
+    #. SwiftStack nodes can optionally talk to each over Fuel Storage network
+
+    #. SwiftStack nodes can talk to SwiftStack Controller via Management (SwiftStack) 
        network (for On-Premises) or Public network (for public Swiftstack Controller)
 
     .. note::
@@ -96,29 +102,10 @@ Please make sure the network configuration like:
         We only use one PACO (Proxy/Account/Comtainer/Object) nodes to deploy a all-in-one 
         Swift cluster in this document and is a minimum deployment. 
         In real environment, as the cluster scales, it might be necessary to specalize nodes
-        into separate Proxy/Account/Container/Object tiers.  
+        into separate Proxy/Account/Container/Object tiers.
+        If the Fuel Storage network does not have adequate bandwidth to support Replication &
+        Cluster-Facing traffic, these interfaces can be on a network external to Fuel
 
-User token validation
----------------------
-
-In this document, Swift cluster only connected to ``Fuel Public network``, that means Swift 
-proxy will veridate user's token through this network, and the admin port ``35357`` is not 
-available for public url, but use auth port ``5000`` with public url shoud be ok, because 
-the ``swift`` user has service role in Keystone and it can do token validation in public url.
-So the identity and auth url should be same likes ``http[s]://<PUBLIC_VIP>:5000/``.
-
-If you have another avaialbe interface on SwiftStack nodes can connect to ``Fuel Management network``, 
-you can switch to admin rul with admin port, so identity url will be ``http[s]://<MANAGEMENT_VIP>:35357/``.
-
-    .. note::
-        You can find the ``<MANAGEMENT_VIP>`` in Fuel environment variables 
-        (deployment_*/primary-controller*.yaml.) Here is the command to help you to find it.
-
-        $ sed -e '/  management:/,/ipaddr:/!d' deployment_*/primary-controller*.yaml | grep ipaddr | awk '{print $2}'
-
-
-
-Swift Proxy server validates user's token to keystone through Public network, so the keystone indi
 
 Use SwiftStack On-Premises Controller
 -------------------------------------
@@ -129,22 +116,19 @@ cluster with SwiftStack controller, here is our `quick start guide`_.
     * 1 SwiftStack On-Premises controller
     * 1 Swift cluster (single node)
 
-Also prepare two Fuel slave nodes:
-
-    * 1 Controller Node
-    * 1 Compute Node (have **Compute** and **Storage - Cinder** roles)
-
+Also prepare a Fuel environment using Slave nodes according to the `Fuel Install Guide`_.
 
     .. note::
-        In this diagram, the Swift cluster is also connected to cluster-facing and data replication 
-        network (SwiftStack) outside of Fuel network, which prevents network starvation on Fuel 
-        networks when Swift service daemons are moving data or clients send large data into Swift 
-        cluster. So, just make sure the public network is connected should be enough, Other 
-        interfaces of SwiftStack Nodes, should be used for cluster-facing and replication networks.
+        In this diagram, the Swift cluster is also connected to Fuel Storage network for SwiftStack 
+        cluster-facing and data replication network, if you have performance concern, please consider 
+        to separate Swift cluster-facing and data replication network out of Fuel networks.
+        That prevents network starvation on Fuel Storage network when Swift service daemons are 
+        moving data or clients upload large data into the Swift cluster. 
 
-        Also, the SwiftStack Nodes need to communicate with the SwiftStack controller, so please make
-        sure they can talked to each other, you can combined ``management (SwiftStack)`` to Fuel 
-        Network as well, that depends on your network design.
+        Also, SwiftStack Nodes need to communicate with the On-Premises controller over Fuel 
+        Management network, so please make sure the On-Premises controller alos connected to Fuel Management
+        network. You can run a CLI command ``ssdiag`` on SwiftStack nodes to check the connectivity 
+        between SwiftStack Nodes and Controller.
 
     .. image:: images/use_on_prem.png
 
@@ -157,43 +141,41 @@ Please setup a single node Swift cluster with our public controller, here is our
 
     * 1 Swift cluster (single node)
 
-Also prepare two Fuel slave nodes:
-
-    * 1 Controller Node
-    * 1 Compute Node (have **Compute** and **Storage - Cinder** roles)
+Also prepare a Fuel environment using Slave nodes according to the `Fuel Install Guide`_.
 
 
     .. note::
-        In this diagram, the Swift cluster is also connected to cluster-facing and data replication 
-        network (SwiftStack) outside of Fuel network, which prevents network starvation on Fuel 
-        networks when Swift service daemons are moving data or clients send large data into Swift 
-        cluster. So, just make sure the storage network is connected should be enough, Other 
-        interfaces of SwiftStack Nodes, should be used for cluster-facing and replication networks.
+        In this diagram, the Swift cluster is also connected to Fuel Storage network for SwiftStack 
+        cluster-facing and data replication network, if you have performance concern, please consider 
+        to separate Swift cluster-facing and data replication network out of Fuel networks.
+        That prevents network starvation on Fuel Storage network when Swift service daemons are 
+        moving data or clients upload large data into the Swift cluster. 
 
-
-        In this case, we use SwiftStack Public controller, so please make sure the SwiftStack
-        Nodes able to reach Internet.
+        Also, SwiftStack Nodes need to communicate with SwiftStack Public controller over Fuel 
+        Public network, so please make sure SwiftStack Nodes able to reach Internet.
 
     .. image:: images/use_platform.png
 
 
 .. _quick start guide: https://swiftstack.com/docs/install/index.html
+.. _Fuel Install Guide: http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-install-guide.html
 
 
 Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 ------------------------------------------------------------
 
-#. Create a new environment with two nodes:
+#. Create a new environment with available Slave nodes:
 
     * Select **Liberty on Ubuntu Trusty (14.04)** as the distribution
     * Select **Neutron with VLAN segmentation** as the networking setup
     * Use all default settings
-    * 1 Controller Node (has **Controller**)
-    * 1 Compute Node (has **Compute** and **Storage - Cinder** role)
+    * Select node roles according to the `Fuel Install Guide`_.
 
     .. image:: images/1_add_nodes.png
 
     .. _swift_api_ip_address:
+
+.. _Fuel Install Guide: http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-install-guide.html
 
 
 #. Go to the Settings tab of the Fuel Web UI,
@@ -230,21 +212,27 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
     .. image:: images/2_enable_plugin.png
 
 #. Go to the **Networks** tab, scroll down to **Public** section and then
-   modify **IP Range** to skip the Swift Proxy IP (Outwarding-facing) and 
+   modify **IP Range** to skip the IPs of SwiftStack Outward-facing and 
    Swift API IP Address.
 
+   Here is our network configuration for a single SwiftStack node.
+
+    .. image:: images/3_config_network_swift_cluster.png
+
+   Skip `172.16.0.100` (Outward-facing) on Public network.
+
     .. image:: images/3_config_network.png
+    
+   Also, skip the IPs of SwiftStack Cluster-facing and data replication in **IP Range** of
+   **Storage** section, so skip `192.168.1.100` (Cluster-facing/data replication) on Storage 
+   network
 
-    .. note::
-        If you install SwiftStack node on Fuel slave nodes with role ``Operating System`` and 
-        please also skip the IPs in Storage and Management IP ranges, because the Fuel master 
-        doesn't know which IP addresses used for SwiftStack nodes.
+    .. image:: images/3_config_network_storage.png
 
-        In this use case, if you use Storage and Management network for cluster-facing 
-        and data replication network, the Swift cluster interal traffic (Swift proxy to 
-        object server and data replication) will consume more bandwidth on these two networks,
-        that increase network latency when other OpenStack services are running on the same 
-        networks.
+   If you use SwiftStack On-Premises Controller, you need to do same thing in **Management** 
+   section to skip the IPs of SwiftStack nodes and On-Premises Contorller.
+
+    .. image:: images/3_config_network_mgmt.png
 
     .. _proxy_outward_facing_ip:
     .. _swift_api_ip:
@@ -256,7 +244,7 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 
         * ``Outtward-facing IP from SwiftStack Controller UI``
 
-        .. image:: images/3-1_proxy_outwarding-facing.png
+        .. image:: images/3-1_proxy_outward-facing.png
 
         * ``Swift API IP address(Load balancer IP) from SwiftStack Controller UI``
 
@@ -264,14 +252,18 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 
 
 #. Go to the **Nodes** tab of the Fuel Web UI,
-   drag **Storage** interface to **eth2** for all nodes:
+   drag **Storage** interface to **eth2** and untagged the VLAN for all nodes:
 
     .. image:: images/4_config_interfaces.png
+
+    .. note::
+        The management network is tagged with VLAN ID 101 by default, so you also need
+        to configure VLAN ID for interfaces of SwiftStack Nodes and On-Premises Controller
 
    .. _find_keystone_password:
 
 #. Find the settings from deployment information:
-    * Keystone IP Address (public_vip)
+    * Keystone IP Address (management_vip)
     * Swift password
 
     Please login to the Fuel master and create a script file called **swiftstack.sh** 
@@ -289,7 +281,7 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
         fuel deployment --env $environment --default 
         
         # put error checking here 
-        SwiftIP=$(sed -e '/  public:/,/ipaddr:/!d' \
+        SwiftIP=$(sed -e '/  management:/,/ipaddr:/!d' \
                   deployment_*/primary-controller*.yaml \
                   | grep ipaddr | awk '{print $2}')
         SwiftPW=$(sed -e '/swift:/,/user_password:/!d' \
@@ -298,7 +290,7 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 
         echo "Configure Keystone Auth Token Support middleware with the parameters below :" 
         echo "----------------------------------------------------------------------------" 
-        echo "  identity_url      : http://$SwiftIP:5000/"  
+        echo "  identity_url      : http://$SwiftIP:35357/"  
         echo "  auth_url          : http://$SwiftIP:5000/" 
         echo "  admin_user        : swift" 
         echo "  admin_password    : $SwiftPW" 
@@ -319,22 +311,22 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
         Default deployment info was downloaded to /root/deployment_5
         Configure Keystone Auth Token Support middleware with the parameters below :
         ----------------------------------------------------------------------------
-          identity_url      : http://172.16.0.3:5000/
-          auth_url          : http://172.16.0.3:5000/
+          identity_url      : http://192.168.0.2:35357/
+          auth_url          : http://192.168.0.2:5000/
           admin_user        : swift
           admin_password    : v4LiGbh6xPU0vtqXQSMeDjxc
 
    .. _setup_swift_middleware:
 
-#. Once we get Keystone IP (172.16.0.3) and Swift user’s password (``v4LiGbh6xPU0vtqXQSMeDjxc``), \
+#. Once we get Keystone IP (192.168.0.2) and Swift user’s password (``v4LiGbh6xPU0vtqXQSMeDjxc``), \
    let’s login to SwiftStack Controller UI to configure Swift cluster
  
     * Go to the **Middleware** tab, enable and configure **Keystone Auth Token Support** middleware as below:
 
         .. code-block:: bash
 
-            identity_url:      http://172.16.0.3:5000/
-            auth_url:          http://172.16.0.3:5000/
+            identity_url:      http://192.168.0.2:35357/
+            auth_url:          http://192.168.0.2:5000/
             admin_user:        swift
             admin_password:    v4LiGbh6xPU0vtqXQSMeDjxc
             admin_tenant_name: services
@@ -396,7 +388,7 @@ Please run the verification steps below to ensure your SwiftStack plugin is conf
 
     # Test admin account
     ~$ cat rc.admin 
-    export ST_AUTH=http://172.16.0.3:5000/v2.0
+    export ST_AUTH=http://192.168.0.2:5000/v2.0
     export ST_USER=admin:admin
     export ST_KEY=admin
     export ST_AUTH_VERSION=2
@@ -434,7 +426,7 @@ Please run the verification steps below to ensure your SwiftStack plugin is conf
 
     # Test glance account
     ~$ cat rc.glance 
-    export ST_AUTH=http://172.16.0.3:5000/v2.0
+    export ST_AUTH=http://192.168.0.2:5000/v2.0
     export ST_USER=services:glance
     export ST_KEY=iqxWViMcHUjxbWD0hqkvjbon
     export ST_AUTH_VERSION=2
