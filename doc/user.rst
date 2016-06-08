@@ -85,9 +85,10 @@ Network summary
 Please make sure the network configuration like:
 
     1. Fuel controller nodes (Keystone, Glance) can talk to Swift Proxy-server (i.e., 
-       Proxy-only, PAC, PACO node) for :ref:`Outward-facing IP<proxy_outward_facing_ip>`.
+       Proxy-only, PAC, PACO node) over Fuel Management network
     2. Clients can talk to :ref:`Swift API IP Address<swift_api_ip>` (Swift Proxy or 
        External/Internal Load Balancer)
+    3. SwiftStack nodes can optionally talk to each over Fuel Storage network
     3. SwiftStack nodes can talk to SwiftStack Controller via Management (SwiftStack) 
        network (for On-Premises) or Public network (for public Swiftstack Controller)
 
@@ -96,7 +97,10 @@ Please make sure the network configuration like:
         We only use one PACO (Proxy/Account/Comtainer/Object) nodes to deploy a all-in-one 
         Swift cluster in this document and is a minimum deployment. 
         In real environment, as the cluster scales, it might be necessary to specalize nodes
-        into separate Proxy/Account/Container/Object tiers.  
+        into separate Proxy/Account/Container/Object tiers.
+        If the Fuel Storage network does not have adequate bandwidth to support Replication &
+        Cluster-Facing traffic, these interfaces can be on a network external to Fuel
+
 
 User token validation
 ---------------------
@@ -129,10 +133,7 @@ cluster with SwiftStack controller, here is our `quick start guide`_.
     * 1 SwiftStack On-Premises controller
     * 1 Swift cluster (single node)
 
-Also prepare two Fuel slave nodes:
-
-    * 1 Controller Node
-    * 1 Compute Node (have **Compute** and **Storage - Cinder** roles)
+Also prepare a Fuel environment using Slave nodes according to the `Fuel Install Guide`_.
 
 
     .. note::
@@ -157,10 +158,7 @@ Please setup a single node Swift cluster with our public controller, here is our
 
     * 1 Swift cluster (single node)
 
-Also prepare two Fuel slave nodes:
-
-    * 1 Controller Node
-    * 1 Compute Node (have **Compute** and **Storage - Cinder** roles)
+Also prepare a Fuel environment using Slave nodes according to the `Fuel Install Guide`_.
 
 
     .. note::
@@ -178,22 +176,24 @@ Also prepare two Fuel slave nodes:
 
 
 .. _quick start guide: https://swiftstack.com/docs/install/index.html
+.. _Fuel Install Guide: http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-install-guide.html
 
 
 Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 ------------------------------------------------------------
 
-#. Create a new environment with two nodes:
+#. Create a new environment with available Slave nodes:
 
     * Select **Liberty on Ubuntu Trusty (14.04)** as the distribution
     * Select **Neutron with VLAN segmentation** as the networking setup
     * Use all default settings
-    * 1 Controller Node (has **Controller**)
-    * 1 Compute Node (has **Compute** and **Storage - Cinder** role)
+    * Select node roles according to the `Fuel Install Guide`_.
 
     .. image:: images/1_add_nodes.png
 
     .. _swift_api_ip_address:
+
+.. _Fuel Install Guide: http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-install-guide.html
 
 
 #. Go to the Settings tab of the Fuel Web UI,
