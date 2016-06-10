@@ -290,7 +290,7 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 
         echo "Configure Keystone Auth Token Support middleware with the parameters below :" 
         echo "----------------------------------------------------------------------------" 
-        echo "  identity_url      : http://$SwiftIP:35357/"  
+        echo "  identity_url      : http://$SwiftIP:5000/"  
         echo "  auth_url          : http://$SwiftIP:5000/" 
         echo "  admin_user        : swift" 
         echo "  admin_password    : $SwiftPW" 
@@ -311,7 +311,7 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
         Default deployment info was downloaded to /root/deployment_5
         Configure Keystone Auth Token Support middleware with the parameters below :
         ----------------------------------------------------------------------------
-          identity_url      : http://192.168.0.2:35357/
+          identity_url      : http://192.168.0.2:5000/
           auth_url          : http://192.168.0.2:5000/
           admin_user        : swift
           admin_password    : v4LiGbh6xPU0vtqXQSMeDjxc
@@ -325,7 +325,7 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 
         .. code-block:: bash
 
-            identity_url:      http://192.168.0.2:35357/
+            identity_url:      http://192.168.0.2:5000/
             auth_url:          http://192.168.0.2:5000/
             admin_user:        swift
             admin_password:    v4LiGbh6xPU0vtqXQSMeDjxc
