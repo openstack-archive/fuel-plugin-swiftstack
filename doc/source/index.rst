@@ -9,3 +9,5 @@ Guide to the Swiftstack plugin for Fuel ver. 0.3.0.3.0-1
     install
     user
     troubleshoot
+    appendix
+

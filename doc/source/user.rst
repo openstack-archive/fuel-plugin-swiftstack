@@ -346,6 +346,16 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 
 #. Push configure settings to SwiftStack Swift cluster.
 
+#. Netwerk verification check
+   Please check Fuel network configuration and SwiftStack settings before you deploy
+   the OpenStack environment:
+
+   #. SwiftStack Nodes should able to reach Keystone endpoint (internalURL) 
+      on Management network.
+   #. Clients should able to reach SwiftStack Nodes over Public network.
+   #. All IPs of SwiftStack Nodes (includes Load Balancer) should be skip in Fuel networks.
+   #. If you use VLAN, please check VLAN settings on each node
+
 #. Get back to the Fuel Web UI and deploy your OpenStack environment.
 
 #. Once Mirantis OpenStack environment is done, you will see the SwiftStack plugin is also deployed.
@@ -361,19 +371,22 @@ Please run the verification steps below to ensure your SwiftStack plugin is conf
 
   .. code-block:: bash
 
+      ### Login to Controller node
       root@node-23:~# source ~/openrc 
+      root@node-23:~# cat ~/openrc  | grep OS_AUTH_URL
+      export OS_AUTH_URL='http://192.168.0.2:5000/'
 
       ##
-      ## Make sure the keystone VIP is correct
+      ## Correct OS_AUTH_URL, append ‘v2.0’ in the end of line
       ##
       root@node-23:~# export OS_AUTH_URL='http://192.168.0.2:5000/v2.0'
 
       root@node-23:~# keystone endpoint-list |grep KEY
-      | b858f41ee3704f32a05060932492943b | RegionOne 
-      | http://172.16.0.100:80/v1/KEY_%(tenant_id)s 
-      | http://172.16.0.100:80/v1/KEY_%(tenant_id)s 
-      | http://172.16.0.100:80/v1/KEY_%(tenant_id)s 
-      | 19966ec76f0d455d94caa87d9569a347 |
+      | b858f41ee3704f32a05060932492943b | RegionOne | 
+      http://172.16.0.100:80/v1/KEY_%(tenant_id)s | 
+      http://172.16.0.100:80/v1/KEY_%(tenant_id)s | 
+      http://172.16.0.100:80/v1/KEY_%(tenant_id)s | 
+      19966ec76f0d455d94caa87d9569a347 |
 
   
 .. _verity_cluster_swift_cli:
@@ -453,10 +466,5 @@ Please run the verification steps below to ensure your SwiftStack plugin is conf
                                      X-Trans-Id: txa59a5b16d6724fc68adb7-0057578f9e
                                    Content-Type: text/plain; charset=utf-8
 
-
-Appendix
---------
-
-    * SwiftStack docs can be found at https://swiftstack.com/docs/
 
 

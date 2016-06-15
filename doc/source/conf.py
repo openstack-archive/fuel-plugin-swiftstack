@@ -13,7 +13,6 @@
 # serve to show the default.
 
 import sys
-import os
 import datetime
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -44,11 +43,14 @@ source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
+plugin_guide = 'plugin-guide'
+test_plan = 'test-plan'
+test_report = 'test-report'
 
 # General information about the project.
 project = u'SwiftStack Plugin for Fuel 8.0'
-copyright = u'2015–%s, SwiftStack' % datetime.date.today().year
-author = u'Charles Hsu'
+copyright = u'2015–%s, SwiftStack Inc.' % datetime.date.today().year
+author = u'SwiftStack Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -232,7 +234,13 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'SwiftStackPluginforFuel.tex', u'SwiftStack Plugin for Fuel Documentation',
-     u'SwiftStack Inc.', 'manual'),
+     author, 'manual'),
+    (plugin_guide, 'plugin-guide.tex', u'Guide for SwiftStack Fuel Plugin',
+     author, 'howto'),
+    (test_plan, 'test-plan.tex', u'Test Plan for SwiftStack Fuel Plugin',
+     author, 'howto'),
+    (test_report, 'test-report.tex', u'Test Report for SwiftStack Fuel Plugin',
+     author, 'howto'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
