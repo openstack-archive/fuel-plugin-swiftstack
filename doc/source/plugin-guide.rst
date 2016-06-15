@@ -98,10 +98,5 @@ Known issues
     It is highly recommended to use certificates signed by a known, trusted Certificate
 
 
-Appendix
-========
-
-#. SwiftStack docs can be found at https://swiftstack.com/docs/
-
-
+.. include:: appendix.rst
 

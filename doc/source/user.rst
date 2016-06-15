@@ -292,6 +292,7 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
         echo "----------------------------------------------------------------------------" 
         echo "  identity_url      : http://$SwiftIP:5000/"  
         echo "  auth_url          : http://$SwiftIP:5000/" 
+        echo "  auth_url (for s3) : http://$SwiftIP:35357/" 
         echo "  admin_user        : swift" 
         echo "  admin_password    : $SwiftPW" 
 
@@ -313,6 +314,7 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
         ----------------------------------------------------------------------------
           identity_url      : http://192.168.0.2:5000/
           auth_url          : http://192.168.0.2:5000/
+          auth_url (for s3) : http://192.168.0.2:35357/
           admin_user        : swift
           admin_password    : v4LiGbh6xPU0vtqXQSMeDjxc
 
@@ -343,8 +345,38 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 
         .. image:: images/6_config_key2.png
 
+#. If you want to your Swift cluster supports S3 APIs, please also enabled 
+   `Swift S3 Emulation Layer Middleware`_ and **Swift3 Keystone Integration Middleware**
+  
+   #. Enable Swift S3 Emulation Layer Middleware, select ``Enabled`` checkbox and submit it 
+
+        .. image:: images/enable_swift3.png
+
+
+   #. Enable Swift3 Keystone Integration Middleware, select ``Enabled`` checkbox 
+      and fill **http://192.168.0.2:35357/** to ``auth_url`` and then submit it
+
+        .. code-block:: bash
+
+            auth_url (for s3): http://192.168.0.2:35357/
+
+        .. image:: images/enable_s3token.png
+
+
+.. _Swift S3 Emulation Layer Middleware: https://swiftstack.com/docs/admin/middleware/s3_middleware.html
+   
 
 #. Push configure settings to SwiftStack Swift cluster.
+
+#. Netwerk verification check
+   Please check Fuel network configuration and SwiftStack settings before you deploy
+   the OpenStack environment:
+
+   #. SwiftStack Nodes should able to reach Keystone endpoint (internalURL) 
+      on Management network.
+   #. Clients should able to reach SwiftStack Nodes over Public network.
+   #. All IPs of SwiftStack Nodes (includes Load Balancer) should be skip in Fuel networks.
+   #. If you use VLAN, please check VLAN settings on each node
 
 #. Get back to the Fuel Web UI and deploy your OpenStack environment.
 
@@ -353,34 +385,39 @@ Deploying Mirantis OpenStack with a SwiftStack Swift cluster
 .. image:: images/7_deploy_verify1.png
 
 Verification
-++++++++++++
+------------
 
 Please run the verification steps below to ensure your SwiftStack plugin is configured properly:
 
-#. Check API endpoints with Keystone CLI:
+Check API endpoints with Keystone CLI:
+++++++++++++++++++++++++++++++++++++++
 
   .. code-block:: bash
 
-      root@node-23:~# source ~/openrc 
+      ### Login to Controller node
+      ~$ source ~/openrc 
+      ~$ cat ~/openrc  | grep OS_AUTH_URL
+      export OS_AUTH_URL='http://192.168.0.2:5000/'
 
       ##
-      ## Make sure the keystone VIP is correct
+      ## Correct OS_AUTH_URL, append ‘v2.0’ in the end of line
       ##
-      root@node-23:~# export OS_AUTH_URL='http://192.168.0.2:5000/v2.0'
+      ~$ export OS_AUTH_URL='http://192.168.0.2:5000/v2.0'
 
-      root@node-23:~# keystone endpoint-list |grep KEY
-      | b858f41ee3704f32a05060932492943b | RegionOne 
-      | http://172.16.0.100:80/v1/KEY_%(tenant_id)s 
-      | http://172.16.0.100:80/v1/KEY_%(tenant_id)s 
-      | http://172.16.0.100:80/v1/KEY_%(tenant_id)s 
-      | 19966ec76f0d455d94caa87d9569a347 |
+      ~$ keystone endpoint-list |grep KEY
+      | b858f41ee3704f32a05060932492943b | RegionOne | 
+      http://172.16.0.100:80/v1/KEY_%(tenant_id)s | 
+      http://172.16.0.100:80/v1/KEY_%(tenant_id)s | 
+      http://172.16.0.100:80/v1/KEY_%(tenant_id)s | 
+      19966ec76f0d455d94caa87d9569a347 |
 
   
 .. _verity_cluster_swift_cli:
 
-#. Verify Swift cluster, Keystone and Glance integration through Swift cli
+Verify Swift cluster, Keystone and Glance integration through Swift cli
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  * Check admin account
+  Check admin account
 
   .. code-block:: bash
 
@@ -410,7 +447,7 @@ Please run the verification steps below to ensure your SwiftStack plugin is conf
                    X-Trans-Id: txf07064e2471544b29f84d-0057579086
                  Content-Type: text/plain; charset=utf-8
 
-  * Check glance account when **Use Swift as Glance backend** is enabled
+  Check glance account when **Use Swift as Glance backend** is enabled
 
   .. code-block:: bash
 
@@ -454,9 +491,124 @@ Please run the verification steps below to ensure your SwiftStack plugin is conf
                                    Content-Type: text/plain; charset=utf-8
 
 
-Appendix
---------
 
-    * SwiftStack docs can be found at https://swiftstack.com/docs/
+Verify S3 APIs, Swift cluster and Keystone 
+++++++++++++++++++++++++++++++++++++++++++
+
+  Find EC2 access key and secret key from Horizon 
+
+    .. image:: images/horizon_access.png
+
+  When you click ``View Credentials``, it shows a diaglog for EC2 keys 
+  in below,
+
+    .. image:: images/show_ec2.png
+
+  Or you can use keystone CLI to get EC2 keys.
+
+  .. code-block:: bash
+
+   ~$ keystone ec2-credentials-list
+   +--------+----------------------------------+----------------------------------+
+   | tenant |              access              |              secret              |
+   +--------+----------------------------------+----------------------------------+
+   | admin  | e8f3617f41d34d02a7ba129f8581a3b6 | 85f2ae90a9614a8b832747af3c6e6c9b |
+   +--------+----------------------------------+----------------------------------+
+
+
+  Upload single file to a container
+
+  .. code-block:: bash
+
+    ~$ swift upload test rc.admin
+    ~$ swift stat test rc.admin
+           Account: KEY_5f88ea5c603f4c3bb091aac02001b318
+         Container: test 
+            Object: rc.admin
+      Content Type: application/octet-stream
+    Content Length: 115
+     Last Modified: Wed, 15 Jun 2016 12:48:44 GMT
+              ETag: ed6eb254c7a7ba2cba19728f3fff5645
+        Meta Mtime: 1465994722.799261
+     Accept-Ranges: bytes
+       X-Timestamp: 1465994923.49250
+        X-Trans-Id: tx3dd9b89f2ebc4579857b7-005761743f
+
+    
+  Please create a script file called s3get.sh and add contents in below,
+
+  .. code-block:: bash
+
+    #!/bin/bash
+
+    url=$1
+    s3key=$2
+    s3secret=$3
+    bucket=$4
+    file=$5
+
+    # Path style
+    resource="/${bucket}/${file}"
+    fullpath="${url}/${bucket}/${file}"
+
+    dateValue=`date -u +%a,\ %d\ %h\ %Y\ %T\ %Z`
+
+    echo ${dateValue}
+    echo ${resource}
+
+    stringToSign="GET\n\n\n${dateValue}\n${resource}"
+    signature=`echo -en ${stringToSign}|openssl sha1 -hmac ${s3secret} -binary|base64`
+    curl -I -v -X GET \
+        -H "Date: ${dateValue}" \
+        -H "Authorization: AWS ${s3key}:${signature}" \
+        ${fullpath}
+
+  Try to retrieve the object (container: test, object: rc.admin) through S3 APIs.
+
+  .. code-block:: bash
+
+    ~$ ./s3get.sh http://172.16.0.100:80 \
+    >                            e8f3617f41d34d02a7ba129f8581a3b6 \
+    >                            85f2ae90a9614a8b832747af3c6e6c9b \
+    >                            test rc.admin
+    Wed, 15 Jun 2016 15:25:51 UTC
+    /test/rc.admin
+    * Hostname was NOT found in DNS cache
+    *   Trying 172.16.0.100...
+    * Connected to 172.16.0.100 (172.16.0.100) port 80 (#0)
+    > GET /test/rc.admin HTTP/1.1
+    > User-Agent: curl/7.35.0
+    > Host: 172.16.0.100
+    > Accept: */*
+    > Date: Wed, 15 Jun 2016 15:25:51 UTC
+    > Authorization: AWS e8f3617f41d34d02a7ba129f8581a3b6:tHnRZjiCzPzeJhs8SAQ8msBWH3Y=
+    > 
+    < HTTP/1.1 200 OK
+    HTTP/1.1 200 OK
+    < Content-Length: 115
+    Content-Length: 115
+    < x-amz-id-2: tx43598dcd71274707a7adc-0057617380
+    x-amz-id-2: tx43598dcd71274707a7adc-0057617380
+    < x-amz-meta-mtime: 1465994722.799261
+    x-amz-meta-mtime: 1465994722.799261
+    < Last-Modified: Wed, 15 Jun 2016 12:48:44 GMT
+    Last-Modified: Wed, 15 Jun 2016 12:48:44 GMT
+    < ETag: "ed6eb254c7a7ba2cba19728f3fff5645"
+    ETag: "ed6eb254c7a7ba2cba19728f3fff5645"
+    < x-amz-request-id: tx43598dcd71274707a7adc-0057617380
+    x-amz-request-id: tx43598dcd71274707a7adc-0057617380
+    < Content-Type: application/octet-stream
+    Content-Type: application/octet-stream
+    < X-Trans-Id: tx43598dcd71274707a7adc-0057617380
+    X-Trans-Id: tx43598dcd71274707a7adc-0057617380
+    < Date: Wed, 15 Jun 2016 15:25:52 GMT
+    Date: Wed, 15 Jun 2016 15:25:52 GMT
+
+    < 
+    * Excess found in a non pipelined read: excess = 115 url = /test/rc.admin 
+                                                           (zero-length body)
+    * Connection #0 to host 172.16.0.100 left intact
+
+
 
 
