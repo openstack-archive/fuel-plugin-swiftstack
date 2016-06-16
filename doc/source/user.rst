@@ -10,25 +10,25 @@ controller and Fuel slave nodes.
 SwiftStack Swift Cluster
 ------------------------
 
-In SwiftStack Swift cluster, that have three network interfaces need to configure for each node.
+In a SwiftStack Swift cluster, each node has three networks which can be configured on its interfaces:
  
-  #. Outward-facing interface:
+  #. Outward-facing network:
 
-     The clients traffic come into this interface, so if you consider putting an external 
+     The clients traffic comes into this interface, so if you consider putting an external
      load balancer in front of the cluster, you should add these outward-facing IPs to the load 
      balancer pool.
 
-  #. Cluster-facing interface:
+  #. Cluster-facing network:
 
-     The interface for Swift internal traffic likes proxy-server from/to object-server.
+     The interface for Swift internal traffic (i.e. proxy-server from/to object-server).
 
-  #. Data replication interface:
+  #. Data replication network:
 
-     This interface is dedicated for object replication.
+     The interface for object-server replication.
 
 If the node only has one network interface, you can assign all network interfaces to this 
-interface, but it'll be mixed all traffic together. So we suggest using dedicated interface for 
-these three network. Check `Configure network`_ to get more detail.
+interface. However, this could bottleneck performance, so we suggest using dedicated interface for
+these three networks. Check `Configure network`_ to get more detail.
 
 .. _Configure network: https://swiftstack.com/docs/admin/node_management/configure_network.html#network
 
@@ -36,16 +36,17 @@ these three network. Check `Configure network`_ to get more detail.
 SwiftStack Controller
 ---------------------
 
-SwiftStack provide two types of controllers, first one is **public controller** (we called `Platform controller`) 
-and the second one is **On-Premises controller**. The public controller is for customers they don't want to setup
-a SwiftStack Controller on their data center and also allow the nodes have internet connectivity for management
-purpose. So, if you don't have an controller account yet, `try to create it`_ .
+SwiftStack provides two options for the Controller: the **Hosted Controller** (we called `Platform controller`_)
+and the is **On-Premises Controller**.  The Hosted Controller is a as-a-service solution for customers who don't
+want to set up and maintain a SwiftStack Controller in their data center.  This option requires the SwiftStack nodes
+have internet connectivity to be managed.  If you don't have an account on the `Platform controller`,
+`sign up on our website`_.
 
-In On-Premises controller, you need to get the setup script and tarball from SwiftStack sales, and they'll help 
-you to setup an On-Premises controller. 
+The On-Premises controller is a SwiftStack controller deployed in a customer datacenter behind the customer's
+firewall.  To obtain the On-Premises controller, please `contact SwiftStack Sales`_.
 
-And make sure you have an account can login to controller and able to setup a Swift cluster before you start 
-to test the plugin.
+Before you can use the plugin, you will need to have deployed an On-Premises Controller, or have an account on
+the Hosted Controller.
 
 The network configuration in SwiftStack Controller is quite simple, just check the SwiftStack Nodes can reach 
 SwiftStack controller because SwiftStack Nodes communciate with controller over OpenVPN connections. But if
@@ -61,7 +62,8 @@ to configure the firewall.
         external Swift cluster which will be more efficienct from scratch.
 
 .. _Platform controller: https://platform.swiftstack.com
-.. _try to create it: https://www.swiftstack.com/try-it-now/ 
+.. _sign up on our website: https://www.swiftstack.com/try-it-now/
+.. _contact SwiftStack Sales: https://www.swiftstack.com/contact-us/
 
 .. _SwiftStack Controller Security: https://swiftstack.com/docs/security/controller.html#swiftstack-controller-security
 .. _SwiftStack Node Security: https://swiftstack.com/docs/security/node.html#swiftstack-node-security
