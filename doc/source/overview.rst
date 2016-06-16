@@ -61,3 +61,18 @@ Known issues
     It is highly recommended to use certificates signed by a known, trusted Certificate 
     Authority if you require TLS/SSL for your Swift cluster endpoint.
 
+#. Integration with `LDAP Fuel plugin`_ (You can find the validated rpm `from Mirantis`_).
+
+    LDAP Fuel plugin can integrate your LDAP server as a Keystone Identity provider, and that 
+    requires some pre-create OUs and Group on the LDAP server. If you have some existed users
+    conflict with OpenStack environment (i.e., swift, heat, .., etc), that causes the deployment
+    failed. And SwiftStack Fuel plugin will try to create Swift user for Swift service in Keystone 
+    DB, please make sure you don't have an existed user called ``Swift`` on your LDAP server. 
+    And Here is a `document`_ to help you setup these OUs and Groups.
+
+
+.. _LDAP Fuel plugin: https://github.com/openstack/fuel-plugin-ldap 
+.. _from Mirantis: https://www.mirantis.com/validated-solution-integrations/fuel-plugins/
+.. _document: https://wiki.openstack.org/wiki/OpenLDAP
+
+
