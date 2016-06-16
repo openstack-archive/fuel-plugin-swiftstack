@@ -89,7 +89,7 @@ Known issues
 #. Need DNS server support to map Swift APIs hostname and IP
 
     SwiftStack provides a software load balancer, which requries an external DNS server
-    to operate. Please use DNS server insteand of static hostname records in /etc/hosts.
+    to operate. Please use DNS server instead of static hostname records in /etc/hosts.
 
 #. Self-signed SSL certificates are not supported in the SwiftStack plugin
 
