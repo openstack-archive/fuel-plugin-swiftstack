@@ -1,35 +1,50 @@
-- id: swift
-  version: 2.0.0
+- id: swift-proxy_storage
   type: skipped
-
-- id: primary-swift
-  version: 2.0.0
-  type: skipped
-
-- id: openstack-haproxy-swift
-  version: 2.0.0
-  type: skipped
+  version: 2.1.0
+  role: ['/.*/']
+  requires: [pre_deployment_start]
 
 - id: swift-rebalance-cron
-  version: 2.0.0
   type: skipped
+  version: 2.1.0
+  role: ['/.*/']
+  requires: [pre_deployment_start]
 
 - id: swift-keystone
-  version: 2.0.0
   type: skipped
+  version: 2.1.0
+  role: ['/.*/']
+  requires: [pre_deployment_start]
 
-- id: swift_zone
-  version: 2.0.0
+- id: openstack-haproxy-swift
+  version: 2.1.0
   type: skipped
+  role: ['/.*/']
+  requires: [pre_deployment_start]
 
 - id: upload_cirros
-  version: 2.0.0
-  type: shell
+  version: 2.1.0
+  type: skipped
   role: [primary-controller]
-  condition: "settings:swiftstack.upload_cirros_test.value == true"
+  requires: [pre_deployment_start]
+
+- id: swiftstack-upload-cirros
+  type: shell
+  version: 2.1.0
+  role: [primary-controller]
+  requires: [swiftstack-tls-setup, swiftstack-enable-glance-backend, swiftstack-configure-swift-endpoint]
+  required_for: [post_deployment_end]
+  condition:
+    yaql_exp: >
+        $.swiftstack.upload_cirros_test
+  parameters:
+    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/astute/upload_cirros.rb
+    retries: 5
+    interval: 60
+    timeout: 600
 
 - id: swiftstack-tls-setup
-  version: 2.0.0
+  version: 2.1.0
   role: [primary-controller, controller, compute, compute-vmware, cinder, cinder-vmware, primary-mongo, mongo, ceph-osd, virt]
   requires: [post_deployment_start]
   required_for: [post_deployment_end]
@@ -40,7 +55,7 @@
     timeout: 420
 
 - id: swiftstack-configure-swift-endpoint
-  version: 2.0.0
+  version: 2.1.0
   role: [primary-controller]
   required_for: [post_deployment_end, swiftstack-enable-glance-backend]
   requires: [post_deployment_start,swiftstack-tls-setup]
@@ -51,7 +66,7 @@
     timeout: 420
 
 - id: swiftstack-enable-glance-backend
-  version: 2.0.0
+  version: 2.1.0
   role: [primary-controller, controller]
   required_for: [post_deployment_end]
   requires: [post_deployment_start, swiftstack-tls-setup]
